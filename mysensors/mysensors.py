@@ -212,8 +212,8 @@ class SerialGateway(Gateway, threading.Thread):
             try:
                 response = self.logic(msg)
             except ValueError:
-                response = None
                 LOGGER.exception('Not valid message')
+                continue
             if response is not None:
                 try:
                     self.send(response.encode())
@@ -292,6 +292,17 @@ class Message:
          self.sub_type) = [int(f) for f in data]
 
     def encode(self):
+        """ Encode a command string from message. """
+        return ";".join([str(f) for f in [
+            self.node_id,
+            self.child_id,
+            int(self.type),
+            self.ack,
+            int(self.sub_type),
+            self.payload,
+        ]]) + "\n"
+
+    def encode2(self):
         """ Encode a command string from message. """
         return ";".join([str(f) for f in [
             self.node_id,
